@@ -397,14 +397,18 @@ class HttpClient
     protected function processResponse()
     {
         $body = $this->response->getBody();
-
+        // print_r($body);
+        
         // Look for UTF-8 BOM and remove.
         if (0 === strpos(bin2hex(substr($body, 0, 4)), 'efbbbf')) {
             $body = substr($body, 3);
         }
+        if (substr($body, 0, 9) == 'Products:') {
+            $body = substr($body, 9, strlen($body));
+        }
 
         $parsedResponse = \json_decode($body);
-
+        
         // Test if return a valid JSON.
         if (JSON_ERROR_NONE !== json_last_error()) {
             $message = function_exists('json_last_error_msg') ? json_last_error_msg() : 'Invalid JSON returned';
@@ -444,6 +448,7 @@ class HttpClient
 
         // Get response.
         $response = $this->createResponse();
+
 
         // Check for cURL errors.
         if (\curl_errno($this->ch)) {
